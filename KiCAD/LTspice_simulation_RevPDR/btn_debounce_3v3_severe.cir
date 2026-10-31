@@ -1,0 +1,45 @@
+* ARM/FIRE button debounce at 3.3 V (Rev DD, Teensy 4.1) -- ACTIVE LOW
+* Rpu = 6.9k, C = 2.2 uF, contact Ron = 10 ohm, SEVERE bounce (5 ms opens)
+.tran 0 120m 0 2u
+V33  v33 0 3.3
+Rpu  v33 btn 6.9k
+C1   btn 0 2.2u
+S1   btn 0 vctl 0 SWBTN
+Vctl vctl 0 PWL(
++ 0.000m 0
++ 0.999m 0
++ 1.000m 1
++ 1.499m 1
++ 1.500m 0
++ 6.499m 0
++ 6.500m 1
++ 6.999m 1
++ 7.000m 0
++ 11.999m 0
++ 12.000m 1
++ 12.499m 1
++ 12.500m 0
++ 17.499m 0
++ 17.500m 1
++ 17.999m 1
++ 18.000m 0
++ 22.999m 0
++ 23.000m 1
++ 49.999m 1
++ 50.000m 0
++ 54.999m 0
++ 55.000m 1
++ 55.999m 1
++ 56.000m 0
++ 60.999m 0
++ 61.000m 1
++ 61.999m 1
++ 62.000m 0
++ 66.999m 0
++ 67.000m 1
++ 67.999m 1
++ 68.000m 0
++ 100m 0
++ )
+.model SWBTN SW(Ron=10 Roff=1G Vt=0.5 Vh=0.1)
+.end

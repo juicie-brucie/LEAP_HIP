@@ -1,0 +1,4 @@
+(sym_lib_table
+	(version 7)
+	(lib (name "LEAP_HIP") (type "KiCad") (uri "${KIPRJMOD}/LEAP_HIP.kicad_sym") (options "") (descr "LEAP HIP project symbols (Teensy 4.1)"))
+)

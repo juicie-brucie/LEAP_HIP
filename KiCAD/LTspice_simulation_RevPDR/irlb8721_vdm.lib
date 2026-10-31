@@ -1,0 +1,12 @@
+* IRLB8721PBF -- LTspice VDMOS, calibrated to Infineon datasheet (25 C, typ)
+*   Rds(on) = 6.5 mOhm @ Vgs=10 V   (sim 6.56)
+*   Rds(on) = 13.1 mOhm @ Vgs=4.5 V (sim 13.33)
+*   Vgs(th) 1.8 V typ, Qg 7.6 nC @4.5 V, Qgd 3.4 nC, Vds 30 V, Id 62 A
+.model IRLB8721 VDMOS(Rg=1.7 Vto=1.8 Kp=37.6 Rs=1.6m Rd=1.7m Rb=2m
++ Cgs=1.3n Cgdmax=900p Cgdmin=60p Cjo=700p m=0.5 Vj=0.8
++ Is=1e-9 N=1 tt=20n)
+
+* same die, Vgs(th) at the datasheet maximum (2.35 V) -- worst-case gate drive
+.model IRLB8721_WC VDMOS(Rg=1.7 Vto=2.35 Kp=37.6 Rs=1.6m Rd=1.7m Rb=2m
++ Cgs=1.3n Cgdmax=900p Cgdmin=60p Cjo=700p m=0.5 Vj=0.8
++ Is=1e-9 N=1 tt=20n)

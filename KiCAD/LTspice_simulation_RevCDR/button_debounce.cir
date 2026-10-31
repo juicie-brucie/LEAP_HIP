@@ -1,0 +1,49 @@
+* Button debounce RC filter — ARM_BTN / FIRE_BTN analysis
+* Circuit: button connects pin to 5V through Rcontact (10 Ohm)
+*          10k pulldown + 2.2uF cap to GND on Arduino pin
+* Bounce model: press at 1ms, 4 bounces (0.5ms open each), settles at 5ms
+*
+* Switch model: voltage-controlled switch S1 in series with 5V rail.
+* When VCTRL=1 (closed): S1 Ron=10 ohm (contact resistance).
+* When VCTRL=0 (open):   S1 Roff=1G ohm (open circuit — cap discharges
+* only through Rpd, giving correct tau = 10k x 2.2uF = 22ms).
+* Previous PWL-source model was wrong: 0V on the source pulled ARPIN
+* through Rcontact (10 ohm) not Rpd (10k), giving tau=22us not 22ms.
+.tran 5u 20ms 0 5u
+
+* 5V rail
+V5 VFIVE 0 DC 5
+
+* Switch control: 1 = contact closed, 0 = bouncing open
+V_ctrl VCTRL 0 PWL(
++  0       0
++  0.999m  0
++  1.000m  1
++  1.499m  1
++  1.500m  0
++  1.999m  0
++  2.000m  1
++  2.499m  1
++  2.500m  0
++  2.999m  0
++  3.000m  1
++  3.499m  1
++  3.500m  0
++  3.999m  0
++  4.000m  1
++  4.499m  1
++  4.500m  0
++  4.999m  0
++  5.000m  1
++  20m     1
++ )
+
+* Voltage-controlled switch: VFIVE -> ARPIN, controlled by VCTRL
+S1 VFIVE ARPIN VCTRL 0 SW_BTN
+.model SW_BTN SW(Ron=10 Roff=1G Vt=0.5 Vh=0.1)
+
+* Arduino pin: 10k pulldown + 2.2uF filter cap
+Rpd   ARPIN  0  10k
+Cfilt ARPIN  0  2.2u
+
+.end

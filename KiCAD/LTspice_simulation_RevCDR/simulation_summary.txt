@@ -1,0 +1,97 @@
+BURPG HIP Rev B — LTspice Simulation Summary
+=============================================
+Date: 2026-09-28
+Simulator: LTspice 26.0 for macOS
+MOSFET model: IRLZ44N.spi (Infineon/Symmetry MODPEX, SPICE3)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Q1 SOLENOID DRIVE  (solenoid_drive.cir)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Circuit: IRLZ44N → 100 µH / 5 Ω solenoid, 1N4007 flyback, 12 V rail
+Gate drive: Arduino 5 V logic → 220 Ω series → 10 kΩ pulldown
+
+Results:
+  Flyback spike (turn-off):    13.44 V  (+1.44 V above 12 V rail)
+  Steady-state current:         2.389 A  (expected 12/5 = 2.400 A, 99.6%)
+  Gate voltage at saturation:   4.89 V  (Vgs(th) ≈ 2 V — fully enhanced)
+  L/R rise time constant:       20 µs   (100 µH / 5 Ω)
+  Time to 99% steady-state:    ~100 µs  (5τ)
+  MOSFET power dissipation:    ~0.12 W  (I² × Rds(on) ≈ 22 mΩ)
+  Solenoid coil dissipation:   28.8 W   (I² × R = 2.4² × 5)
+
+Assessment: PASS — no electrical concerns.
+  The flyback spike is comfortably below the IRLZ44N's 55 V Vds rating.
+  The 1N4007 clamps within one forward-voltage drop above the supply.
+  MOSFET runs cool. The solenoid coil dissipates 28.8 W; confirm your
+  specific solenoid's duty-cycle rating for the 5 s test run (= 144 J
+  into the winding). 45 s worst-case = 1296 J.
+
+Note: The MODPEX SPICE model uses Vgs(th) = 2.09 V, slightly above the
+datasheet max of 2 V. Real parts typically switch at ~1.5 V, so actual
+turn-on in hardware will be marginally faster than simulated.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. Q2 RELAY COIL DRIVE  (relay_coil_drive.cir)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Circuit: IRLZ44N → SANYOU SRD-12VDC-SL-C coil (modelled as 440 mH / 400 Ω),
+         1N4007 flyback, 12 V rail
+Gate drive: same as Q1
+
+Results:
+  Flyback spike (turn-off):    12.80 V  (+0.80 V above 12 V rail)
+  Steady-state coil current:   30.00 mA (expected 12/400 = 30.0 mA, exact)
+  Gate voltage at saturation:   4.89 V
+  L/R rise time constant:       1.1 ms  (440 mH / 400 Ω)
+  Relay pick-up time:          ~5.5 ms  (5τ)
+  Coil power dissipation:      360 mW   (30 mA × 12 V, continuous-rated)
+
+Assessment: PASS — no electrical concerns.
+  Spike is even smaller than the solenoid because the 400 Ω coil resistance
+  dissipates stored energy faster. D2 barely conducts. Relay picks up well
+  before the igniter circuit becomes live. Coil is rated for continuous duty.
+
+Note: Consider replacing Q2 with a 2N7002 (SOT-23, 60 V / 115 mA). The
+IRLZ44N is heavily over-specified at 47 A / 55 V driving a 30 mA load.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. BUTTON DEBOUNCE RC FILTER  (button_debounce.cir)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Circuit: Button → 10 Ω contact resistance → Arduino pin
+         10 kΩ pulldown + 100 nF filter cap to GND
+Bounce model: 4 × 0.5 ms contact opens after initial press, settles at 5 ms
+
+ATmega328P Schmitt trigger thresholds (5 V supply):
+  HIGH threshold (Vih): 3.5 V  (0.7 × Vcc)
+  LOW  threshold (Vil): 1.5 V  (0.3 × Vcc)
+
+Results (100 nF, current Rev B):
+  RC time constant:             1.0 ms
+  Voltage hold above Vih during bounce: 0.36 ms
+  Pin voltage at end of 0.5 ms bounce: ~0.0 V  (full dropout)
+  Glitch edges seen by Arduino: 4  (false LOW→HIGH transitions)
+
+Assessment: FAIL for hardware debounce alone with 100 nF.
+  Tactile switches typically bounce for 1–20 ms. Every 0.5 ms bounce in
+  the model drops the pin fully to 0 V and back — the Arduino would
+  interpret each as a distinct press event.
+
+Recommended fix:
+  Hardware: Increase Cfilt from 100 nF to 2.2 µF (τ = 22 ms).
+            A 0.5 ms bounce then drops pin by only 2.2% of supply (<0.11 V).
+            Cap should be ceramic or film (avoid electrolytics at this value
+            if PCB space allows; a 2.2 µF X5R 0805 is fine).
+
+  Firmware: Regardless of cap value, implement software debounce on the
+            ARM and FIRE buttons:
+              1. Detect rising edge
+              2. Wait 20 ms
+              3. Re-read pin — accept only if still HIGH
+            For the FIRE button, require ARM to be held first (already
+            in planned two-action firmware sequence).
+
+  Both measures together are strongly recommended for a safety-critical
+  fire circuit. Hardware filter removes glitches before the ISR or
+  polling loop; firmware debounce provides a second independent layer.

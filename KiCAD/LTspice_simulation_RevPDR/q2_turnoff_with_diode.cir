@@ -1,0 +1,20 @@
+* Q2 turn-off at 2 ms with ~6.4 A flowing.  Lign=3u  diode=Dfb drain vf D1N5822
+* bench supply: 220 uF output cap, 1 uH leads each way
+.tran 0 2.06m 1.99m 2n
+Vs    vcc  0    7
+Resr  vcc  vcc2 0.05
+Cout  vcc2 0    220u
+Lpos  vcc2 vcc3 1u
+Rf    vcc3 vf   0.01
+Lign  vf   ig1  3u
+Rign  ig1  drain 1
+Vg    gsrc 0  PULSE(0 3.3 1m 100n 100n 1m 3)
+Rdrv  gsrc gn  50
+Rg    gn   g   220
+Rpd   g    0   10k
+Lneg  0    sret 1u
+M1    drain g sret sret IRLB8721
+Dfb drain vf D1N5822
+.model D1N5822 D(Is=2e-4 N=1.05 Rs=0.015 Cjo=2e-10 Bv=40 Ibv=1e-4 M=0.45 Vj=0.5 Eg=0.69 Xti=2)
+.lib 'irlb8721_vdm.lib'
+.end

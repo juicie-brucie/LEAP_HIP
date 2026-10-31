@@ -1,0 +1,9 @@
+# macOS
+.DS_Store
+
+# arduino-cli / IDE build output
+build/
+*.hex
+*.elf
+*.eep
+*.map

@@ -1,0 +1,18 @@
+* Q1 solenoid drive -- 12 V rail, 100 uH / 5 ohm, 1N5819 flyback, 3.3 V gate
+* IRLB8721PBF at Vgs = 3.3 V (Teensy 4.1 logic)
+.tran 0 2.2 0 20u
+V12   vcc  0  12
+Rsrc  vcc  vcc2  0.05
+Cf    vcc2 0     470u
+Rf    vcc2 vf    0.01
+Lsol  vf   dl    100u
+Rsol  dl   drain 5
+D1    drain vf   D1N5819
+Vg    gsrc 0     PULSE(0 3.3 1m 100n 100n 1.5 3)
+Rdrv  gsrc gn    50
+Rg    gn   g     220
+Rpd   g    0     10k
+M1    drain g 0 0 IRLB8721
+.lib 'irlb8721_vdm.lib'
+.model D1N5819 D(Is=1.1e-4 N=1.05 Rs=0.028 Cjo=1.2e-10 Bv=40 Ibv=1e-4 M=0.45 Vj=0.55 Eg=0.69 Xti=2)
+.end

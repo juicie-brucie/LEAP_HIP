@@ -1,0 +1,8 @@
+* Rds(on) vs Vgs for the calibrated IRLB8721 model
+Vds d 0 0
+Vg  g 0 {vg}
+M1  d g 0 0 IRLB8721
+.lib 'irlb8721_vdm.lib'
+.dc Vds 0 0.1 0.001
+.step param vg list 3.0 3.3 3.6 4.5 5.0 10
+.end

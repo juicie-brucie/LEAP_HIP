@@ -1,0 +1,16 @@
+* Q2 igniter drive -- 7 V bench supply, ~1 ohm igniter, 1.2 s hold, 3.3 V gate
+* no flyback diode (current Rev DD circuit)
+.tran 0 1.4 0 20u
+V7    vcc  0    7
+Rsrc  vcc  vcc2 0.05
+Lsrc  vcc2 vcc3 2u
+Rf    vcc3 vf   0.01
+Lign  vf   ig1  2u
+Rign  ig1  drain 1
+Vg    gsrc 0     PULSE(0 3.3 1m 100n 100n 1.2 3)
+Rdrv  gsrc gn    50
+Rg    gn   g     220
+Rpd   g    0     10k
+M1    drain g 0 0 IRLB8721_WC
+.lib 'irlb8721_vdm.lib'
+.end

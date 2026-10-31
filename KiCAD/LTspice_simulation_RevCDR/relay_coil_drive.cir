@@ -1,0 +1,19 @@
+* Q2 relay coil drive — transient
+* SANYOU SRD-12VDC: 400 Ω coil, inductance estimated ~440 mH
+.tran 10u 300ms 0 1u
+
+V12     VCC    0      DC 12
+VGATE   GSRC   0      PULSE(0 5 1m 1u 1u 200m 600m)
+Rg      GSRC   GATE   220
+Rpd     GATE   0      10k
+X2      DRAIN  GATE   0       IRLZ44N
+Lcoil   VCC    DL     440m    IC=0
+Rcoil   DL     DRAIN  400
+D2      DRAIN  VCC    D1N4007
+C1      VCC    0      470u    IC=12
+
+.model D1N4007 D(IS=4.352n N=1.906 RS=0.6458 BV=1000 IBV=5u TT=4.32u)
+
+.lib /Users/brucemackay/Documents/BURPG Leap HIP/LTspice_simulation/irlz44n.lib
+
+.end

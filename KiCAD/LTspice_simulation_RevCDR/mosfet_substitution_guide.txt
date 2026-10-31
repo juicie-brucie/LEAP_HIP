@@ -1,0 +1,106 @@
+BURPG HIP Rev B — MOSFET Substitution Guide
+============================================
+Date: 2026-09-28
+
+
+This document defines the acceptable parameter envelope for substituting
+Q1 (solenoid drive) and Q2 (relay coil drive) if the IRLZ44N is unavailable.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Q1 — SOLENOID DRIVE  (N-channel, TO-220 or D2PAK preferred)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Operating conditions:
+  Supply voltage:      12 V
+  Load current:        2.4 A continuous (I²R: 2.4² × 5 Ω = 28.8 W in solenoid)
+  Gate drive:          5 V Arduino logic through 220 Ω series resistor
+  Effective Vgs:       ~4.9 V at gate pin
+
+MINIMUM REQUIRED PARAMETERS:
+
+  Vds(max)             ≥ 30 V
+    Recommended: ≥ 55 V for robust margin above 12 V supply + flyback spike.
+    A 20 V device may survive (spike measured at 13.4 V) but gives <7 V margin
+    against parasitic ringing or supply transients — not acceptable.
+
+  Id(cont)             ≥ 3 A  (at 25°C case temperature)
+    Device carries 2.4 A in normal operation. 3 A minimum gives ≥25% margin.
+
+  Vgs(th)              0.8 V – 2.0 V
+    Must be ≤ 2.0 V to ensure full enhancement at 4.9 V gate drive.
+    Must be ≥ 0.8 V so the 10 kΩ gate pulldown reliably holds Q1 off at boot.
+    This range defines "logic-level" N-channel MOSFETs.
+
+  Rds(on) at Vgs = 4.5 V   ≤ 200 mΩ
+    IRLZ44N achieves 22 mΩ. Even at 200 mΩ, MOSFET dissipation is only
+    2.4² × 0.2 = 1.15 W — acceptable without heatsink in TO-220.
+    Lower is better: ≤ 100 mΩ is preferred.
+
+  Vgs(max)             ≥ ±10 V  (gate drive is 5 V, comfortable for any standard device)
+
+  Package:             TO-220, TO-220F, D2PAK, DPAK acceptable.
+    SOT-23 is NOT suitable at 2.4 A — use for Q2 only.
+
+VERIFIED COMPATIBLE DEVICES (no simulation required):
+  IRLZ44N    Infineon/IR   55 V  47 A   22 mΩ  TO-220  (designed device)
+  IRLZ34N    Infineon/IR   60 V  30 A   35 mΩ  TO-220
+  FQP30N06L  ON Semi       60 V  32 A   35 mΩ  TO-220
+  STP16NF06L STMicro       60 V  16 A   80 mΩ  TO-220
+  IRLZ24N    Infineon/IR   55 V  18 A   58 mΩ  TO-220
+
+DEVICES THAT WILL NOT WORK:
+  Any MOSFET with Vgs(th) > 2.5 V (standard-threshold) — will not fully
+  enhance at 5 V gate drive, resulting in high Rds(on) and possible thermal failure.
+  Examples: IRFZ44N (same package, non-logic-level — Vgs(th) up to 4 V).
+  Check: "logic level" or "L" in part number is a good indicator but always
+  verify Vgs(th) max in the datasheet.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Q2 — RELAY COIL DRIVE  (N-channel, SOT-23 or larger)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Operating conditions:
+  Supply voltage:      12 V
+  Load current:        30 mA (SANYOU SRD-12VDC-SL-C coil)
+  Gate drive:          same as Q1
+
+MINIMUM REQUIRED PARAMETERS:
+
+  Vds(max)             ≥ 20 V  (spike measured at 12.8 V; ≥ 20 V gives safe margin)
+    Recommended: ≥ 30 V
+
+  Id(cont)             ≥ 50 mA  (load is 30 mA; 50 mA is 1.67× margin)
+
+  Vgs(th)              0.8 V – 2.0 V  (same logic-level requirement as Q1)
+
+  Rds(on)              ≤ 10 Ω  (at 30 mA even 10 Ω = 0.3 V drop — acceptable)
+    In practice any logic-level device will have Rds(on) < 5 Ω — not a constraint.
+
+  Package:             SOT-23 is ideal. TO-92, TO-220 also fine.
+
+RECOMMENDED DEVICE (preferred over IRLZ44N for this position):
+  2N7002     Various    60 V  115 mA  ~2 Ω  SOT-23  ← preferred
+  BSS138     Various    50 V  200 mA  ~4 Ω  SOT-23
+  2N7000     Various    60 V  200 mA  ~5 Ω  TO-92
+
+  The IRLZ44N is functional in Q2 but is a 47 A MOSFET driving 30 mA —
+  significantly over-specified. The 2N7002 is the standard choice for
+  this type of low-current relay drive application and is widely stocked.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+QUICK SELECTION CHECKLIST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+For any candidate part, verify in the datasheet:
+
+  [ ] Vds(max) > 30 V (Q1) or > 20 V (Q2)
+  [ ] Id(cont) > 3 A (Q1) or > 50 mA (Q2)
+  [ ] Vgs(th) MAX ≤ 2.0 V  — "logic level" designation
+  [ ] Rds(on) specified at Vgs = 4.5 V or 5 V  (not just at 10 V)
+  [ ] Rds(on) ≤ 200 mΩ at Vgs = 4.5 V (Q1 only)
+  [ ] Package suitable for PCB footprint
+
+If a substitute is used, update the schematic BOM and re-run ERC.
+If Rds(on) is significantly different from 22 mΩ, re-run the solenoid
+transient simulation to confirm the flyback spike remains below Vds(max).

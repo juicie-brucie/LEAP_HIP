@@ -1,0 +1,50 @@
+* ARM/FIRE button debounce at 3.3 V (Rev DD, Teensy 4.1) -- ACTIVE LOW
+* Rpu = 10k, C = 2.2 uF, contact Ron = 10 ohm
+* Teensy 4.1 i.MX RT1062 thresholds: VIH = 0.7*3.3 = 2.31 V, VIL = 0.3*3.3 = 0.99 V
+.tran 0 100m 0 2u
+V33  v33 0 3.3
+Rpu  v33 btn 10k
+C1   btn 0 2.2u
+S1   btn 0 vctl 0 SWBTN
+Vctl vctl 0 PWL(
++ 0.000m 0
++ 0.999m 0
++ 1.000m 1
++ 1.499m 1
++ 1.500m 0
++ 1.999m 0
++ 2.000m 1
++ 2.499m 1
++ 2.500m 0
++ 2.999m 0
++ 3.000m 1
++ 3.499m 1
++ 3.500m 0
++ 3.999m 0
++ 4.000m 1
++ 4.499m 1
++ 4.500m 0
++ 4.999m 0
++ 5.000m 1
++ 49.999m 1
++ 50.000m 0
++ 50.499m 0
++ 50.500m 1
++ 50.999m 1
++ 51.000m 0
++ 51.499m 0
++ 51.500m 1
++ 51.999m 1
++ 52.000m 0
++ 52.499m 0
++ 52.500m 1
++ 52.999m 1
++ 53.000m 0
++ 53.499m 0
++ 53.500m 1
++ 53.999m 1
++ 54.000m 0
++ 100m 0
++ )
+.model SWBTN SW(Ron=10 Roff=1G Vt=0.5 Vh=0.1)
+.end

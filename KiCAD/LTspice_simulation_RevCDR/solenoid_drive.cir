@@ -1,0 +1,19 @@
+* Q1 solenoid drive — transient
+* Gate: 0→5 V at 1 ms, held for 45 s worst-case (test is ~5 s)
+.tran 100m 46s 0 100m
+
+V12     VCC    0      DC 12
+VGATE   GSRC   0      PULSE(0 5 1m 1u 1u 44.999s 100s)
+Rg      GSRC   GATE   220
+Rpd     GATE   0      10k
+X1      DRAIN  GATE   0       IRLZ44N
+L1      VCC    DL     100u    IC=0
+Rsol    DL     DRAIN  5
+D1      DRAIN  VCC    D1N4007
+C1      VCC    0      470u    IC=12
+
+.model D1N4007 D(IS=4.352n N=1.906 RS=0.6458 BV=1000 IBV=5u TT=4.32u)
+
+.lib /Users/brucemackay/Documents/BURPG Leap HIP/LTspice_simulation/irlz44n.lib
+
+.end

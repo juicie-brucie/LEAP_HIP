@@ -1,0 +1,15 @@
+LTspice 26.0.2 for MacOS
+Circuit: /Users/brucemackay/Documents/BURPG HIP/LTspice_simulation/solenoid_drive.cir
+Start Time: Mon Sep 28 23:08:34 2026
+solver = Normal
+Maximum thread count: 8
+tnom = 27
+temp = 27
+method = trap
+Direct Newton iteration succeeded in finding operating point.
+Total elapsed time: 4.088 seconds.
+
+Files loaded:
+/Users/brucemackay/Documents/BURPG HIP/LTspice_simulation/solenoid_drive.cir
+/Users/brucemackay/Documents/BURPG HIP/LTspice_simulation/irlz44n.lib
+
