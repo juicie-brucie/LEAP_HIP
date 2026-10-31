@@ -40,3 +40,10 @@ arduino-cli monitor -p /dev/cu.usbmodemXXXX -c baudrate=115200
 Open `firmware/HIP_TestStand/HIP_TestStand.ino`, then select
 **Tools → Board → Teensy 4.1**. The Teensy board package is already
 installed system-wide, so it should appear in the board list directly.
+
+
+# KiCad
+Too tired to add anything to help you download KiCad, the fucking Teensy library etc j
+
+#LTspice
+More way too tired to help someone setup and replicate the LTspice rn
